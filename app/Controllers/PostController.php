@@ -76,9 +76,77 @@ public function ajaxPosts()
 }
 
 //get post for ajax request
-public function getPost()
+public function getPost($id = null)
 {
-    
+    $postModel = new PostModel();
+    $post = $postModel->find($id);
+    return $this->response->setJSON([
+        'error' => false,
+        'message' => $post
+    ]);
 }
+//show post
+public function showPost($id = null)
+{
+        $postModel = new PostModel();
+        $posts = $postModel->find($id);
 
+        $data = ['post' => $posts];
+        $html = view('show', $data);
+
+        return $this->response->setJSON([
+            'html' => $html,
+        ]);
+}
+//delete post
+public function deletePost($id = null){
+    $postModel = new PostModel();
+    $post = $postModel->find($id);
+    if($post){
+        unlink('uploads/avatar/'.$post['image']);
+        $postModel->delete($id);
+        return $this->response->setJSON([
+                'error' => false,
+                'message' => 'Post deleted successfuly'
+        ]);
+    }else{
+        return $this->response->setJSON([
+            'error' => true,
+            'message' => 'Post not found'
+    ]);
+    }
+}
+public function updatePost(){
+    $id = $this->request->getPost('id');
+    $file = $this->request->getFile('file');
+    $filename = $file->getFilename();
+    if($filename != ''){
+        $filename = $file->getRandomName();
+        $file->move('uploads/avatar', $filename);
+        if($this->request->getPost('old_image') != ''){
+            unlink('uploads/avatar/'.$this->request->getPost('old_image'));
+        }else{
+            $filename = $this->request->getPost('old_image');
+        }
+    }
+    $data = [
+        'title' => $this->request->getPost('title'),
+        'category' => $this->request->getPost('category'),
+        'body' => $this->request->getPost('body'),
+        'image' => $filename,
+    ];
+    $postModel = new PostModel();
+    try {
+        $postModel->update($id,$data);
+        return $this->response->setJSON([
+            'error' => false,
+            'message' => 'Post updated sucessfully'
+        ]);
+    } catch (\Throwable $e) {
+        return $this->response->setJSON([
+            'error' => true,
+            'message' => $e
+        ]);
+    }
+}
 }
