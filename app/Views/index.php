@@ -344,7 +344,7 @@
         $('#updatePost_btn').text('Updating...');
         $.ajax({
           method: "post",
-          url: "<?= base_url('/post/update/') ?>",
+          url: "<?= base_url('post/update') ?>",
           data: formpostdata,
           contentType:false,
           cache:false,
@@ -353,9 +353,9 @@
           success: function (response) {
             // console.log(response)
             if(!response.error){
-
+              //1722552428_cda15590955243329ed9
+              //$('#editPost')[0].reset();
               $('#updatepostmodal').modal('hide');
-              // $('#editPost')[0].reset();
               $('#updatePost_btn').text('Save');
               Swal.fire({
                 title: "Sucess!",
@@ -364,6 +364,7 @@
               })
               loadPosts()
             }else{
+              console.log(response)
               Swal.fire({
                 title: "Error!",
                 text: response.message,

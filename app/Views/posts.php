@@ -27,7 +27,7 @@
         </div>
     <?php endforeach; ?>
 <?php else: ?>
-    <p>No posts found</p>
+    <h1 class="text-center text-secondary">No posts found</h1>
 <?php endif; ?>
 
 

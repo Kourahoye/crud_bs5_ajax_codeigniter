@@ -119,15 +119,16 @@ public function deletePost($id = null){
 public function updatePost(){
     $id = $this->request->getPost('id');
     $file = $this->request->getFile('file');
+    $filename = '';
     $filename = $file->getFilename();
     if($filename != ''){
         $filename = $file->getRandomName();
         $file->move('uploads/avatar', $filename);
         if($this->request->getPost('old_image') != ''){
             unlink('uploads/avatar/'.$this->request->getPost('old_image'));
-        }else{
-            $filename = $this->request->getPost('old_image');
         }
+    }else{
+        $filename = $this->request->getPost('old_image');
     }
     $data = [
         'title' => $this->request->getPost('title'),
@@ -137,11 +138,20 @@ public function updatePost(){
     ];
     $postModel = new PostModel();
     try {
-        $postModel->update($id,$data);
-        return $this->response->setJSON([
-            'error' => false,
-            'message' => 'Post updated sucessfully'
-        ]);
+        
+        if($postModel->update($id,$data)){
+            return $this->response->setJSON([
+                'error' => false,
+                'message' => 'Post updated sucessfully'
+            ]);
+        }else{
+            return $this->response->setJSON([
+                'error' => true,
+                'message' => 'Erreur inconnu'
+
+            ]);
+        }
+        
     } catch (\Throwable $e) {
         return $this->response->setJSON([
             'error' => true,
